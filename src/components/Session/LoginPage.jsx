@@ -2,7 +2,7 @@ const React = window.React = require('react');
 const images = require('../../images');
 import Ellipsis from '../Ellipsis.jsx';
 import clickToSelect from '../../lib/clickToSelect';
-
+import bit39 from 'bip39';
 
 // TODO: Move this into Validator
 const isValidSecretKey = input => {
@@ -62,12 +62,24 @@ export default class LoginPage extends React.Component {
     }
     this.handleSubmit = (event) => {
       event.preventDefault();
-      if (!isValidSecretKey(this.state.secretInput)) {
-        return this.setState({
-          invalidKey: true,
-        })
+      // make sure that the seed words has at least 12 words
+      let seedWords = this.state.secretInput.trim();
+      if (seedWords.trim().split(/\s+/g).length >= 12 && seedWords.trim().split(/\s+/g).length <= 24 && bit39.validateMnemonic(seedWords)) {
+        let secretKey = bit39.mnemonicToEntropy(seedWords);
+        console.log('Your Secret Key: ', secretKey)
+        if (isValidSecretKey(secretKey)) {
+          return this.props.d.session.handlers.logInWithSecret(secretKey)
+        }
       }
-      this.props.d.session.handlers.logInWithSecret(this.state.secretInput);
+      return this.setState({
+        invalidKey: true,
+      })
+      // if (!isValidSecretKey(this.state.secretInput)) {
+      //   return this.setState({
+      //     invalidKey: true,
+      //   })
+      // }
+      // this.props.d.session.handlers.logInWithSecret(this.state.secretInput);
     }
     this.handleGenerate = event => {
       let keypair = StellarSdk.Keypair.random();
@@ -106,7 +118,7 @@ export default class LoginPage extends React.Component {
       </div>
     }
 
-    let inputType = this.state.show ? 'text' : 'password';
+    let inputType = this.state.show ? 'text' : 'text';
 
     let body;
 
@@ -117,10 +129,7 @@ export default class LoginPage extends React.Component {
             <p className="LoginPage__intro">Log in with your secret key to manage your account.</p>
             <form onSubmit={this.handleSubmit}>
               <label className="s-inputGroup LoginPage__inputGroup">
-                <input type={inputType} className="s-inputGroup__item S-flexItem-share LoginPage__password" value={this.state.secretInput} onChange={this.handleInput} placeholder="Secret key (example: SBSMVCIWBL3HDB7N4EI3QKBKI4D5ZDSSDF7TMPB.....)" />
-                <div>
-                  <a className="LoginPage__show s-button s-button--light" onClick={this.toggleShow}>Show</a>
-                </div>
+                <input type={inputType} className="s-inputGroup__item S-flexItem-share LoginPage__password" value={this.state.secretInput} onChange={this.handleInput} placeholder="Seed words (example: seed sock milk update focus rotate barely fade car face mechanic mercy.....)" />
               </label>
               {errorMessage}
               <div>

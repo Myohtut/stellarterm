@@ -18,6 +18,7 @@
   "dependencies": {
     "babelify": "7.3.0",
     "bignumber.js": "4.1.0",
+    "bip39": "^2.5.0",
     "gulp-sass": "3.1.0",
     "gulp-useref": "3.1.4",
     "lodash": "4.17.5",
@@ -35,7 +36,7 @@
     "eslint-plugin-import": "2.8.0",
     "eslint-plugin-jsx-a11y": "3.0.2",
     "eslint-plugin-react": "6.10.3",
-    "gulp": "3.9.1",
+    "gulp": "^3.9.1",
     "gulp-autoprefixer": "3.1.1",
     "gulp-inline-source": "3.1.0",
     "gulp-uglify": "2.1.2",
